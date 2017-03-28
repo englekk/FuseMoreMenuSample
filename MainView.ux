@@ -1,0 +1,81 @@
+<App>
+    <JavaScript>
+        var items = [
+            { title:"Title 1", type:0 },
+            { title:"Title 2", type:1 },
+            { title:"Title 3", type:1 },
+            { title:"Title 4", type:0 },
+            { title:"Title 5", type:0 },
+            { title:"Title 6", type:1 },
+            { title:"Title 7", type:1 },
+            { title:"Title 8", type:0 },
+        ];
+
+        var Observable = require("FuseJS/Observable");
+
+        var menuList = Observable();
+        var menuListLen = Observable(() => menuList.length);
+        var menuX = Observable(0);
+        var menuY = Observable(0);
+        
+        var containerInfo;
+        
+        module.exports = {
+            items,
+            menuList,
+            menuListLen,
+            menuX,
+            menuY,
+            containerPlaced: (args) => {
+                containerInfo = args;
+            },
+            showMore: (args) => {
+                menuList.clear();
+
+                menuX.value = containerInfo.width - 130;
+                menuY.value = args.y - args.localY;
+
+                if(args.data.type == 0)
+                {
+                    menuList.add("Menu 1");
+                    menuList.add("Menu 2");
+                }
+                else if(args.data.type == 1)
+                {
+                    menuList.add("Menu 3");
+                    menuList.add("Menu 4");
+                }
+            },
+            hideMenuCallback: () => {
+                if(menuList.length > 0) menuList.clear();
+            }
+        }
+    </JavaScript>
+
+    <ClientPanel Placed="{containerPlaced}">
+        <WhileFloat Value="{menuListLen}" GreaterThan="0">
+            <StackPanel ux:Name="menu" Width="120" X="{menuX}" Y="{menuY}" Padding="10" Background="#eee">
+                <Each Items="{menuList}">
+                    <Button Text="{}" Margin="8" Alignment="Left" />
+                </Each>
+            </StackPanel>
+        </WhileFloat>
+
+        <ScrollView>
+            <StackPanel Background="#fff" Pressed="{hideMenuCallback}">
+                <Each Items="{items}">
+                    <StackPanel>
+                        <Grid ColumnCount="2" Margin="15, 8">
+                            <Text Value="{title}" Alignment="VerticalCenter" />
+                            <Button Text="more" Alignment="Right" Clicked="{showMore}" />
+                        </Grid>
+                        <Panel Margin="15, 0" Height="100">
+                            <Text Value="This is a test." />
+                        </Panel>
+                        <Rectangle Width="100%" Height="1" Background="#ccc" />
+                    </StackPanel>
+                </Each>
+            </StackPanel>
+        </ScrollView>
+    </ClientPanel>
+</App>
